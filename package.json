@@ -1,0 +1,33 @@
+{
+  "name": "jmu",
+  "version": "0.1.0",
+  "description": "The upgrade from JavaScript to MCFunction.",
+  "main": "index.js",
+  "dependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/node": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-proposal-decorators": "^7.4.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "jest": "^24.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "babel-node ./src/index.js",
+    "test": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/langyo/jmg.git"
+  },
+  "keywords": [
+    "minecraft"
+  ],
+  "author": "langyo",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/langyo/jmg/issues"
+  },
+  "homepage": "https://github.com/langyo/jmg#readme"
+}
