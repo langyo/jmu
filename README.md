@@ -107,6 +107,7 @@ c. 行为从句
 4. 选择器
 
 a. 总选择器
+
     - self                      => @s
     - players|players.all       => @a
     - players.random            => @r
@@ -127,21 +128,56 @@ c. 具体方块类型选择器
 JMU 也为每种方块做了实现，并将其作为常量接口开放。不过不像实体类型常量，方块类型常量没有什么可供调用的方法。
 
 d. 附加标签
-    - ```.point(<x>, <y>, <z>)```
+
+- ```.point(<x>, <y>, <z>)```
                                 => \[```x```, ```y```, ```z```]
-        -  ```.round```
-            - ```.from(<value>).to(<value>)```
+    -  ```.round```
+        - ```.from(<value>).to(<value>)```
                                 => \[```x```, ```y```, ```z```, distance=```a```..```b```]
-            - ```.is(<value>)```
+        - ```.is(<value>)```
                                 => \[```x```, ```y```, ```z```, distance=```val```]
-            - ```.moreThan(<value>)```
+        - ```.moreThan(<value>)```
                                 => \[```x```, ```y```, ```z```, distance=```val+1```..]
-            - ```.lessThan(<value>)```
+        - ```.lessThan(<value>)```
                                 => \[```x```, ```y```, ```z```, distance=..```val-1```]
-            - ```.notMoreThan(<value>) | lessThanOrEqual(<value>)```
-            - ```.notLessThan(<value>) | moreThanOrEqual(<value>)```
-            - ```.cube(<dx>, <dy>, <dz>)```
-    - ```.scores(<objective>)```
+        - ```.notMoreThan(<value>) | lessThanOrEqual(<value>)```
+        - ```.notLessThan(<value>) | moreThanOrEqual(<value>)```
+        - ```.cube(<dx>, <dy>, <dz>)```
+- ```.scores(<objective>)```
+    - ```.is(<value>)```
+    - ```.round```
+        - ```.from(<value>).to(<value>)```
+        - ```.is(<value>)```
+        - ```.moreThan(<value>)```
+        - ```.lessThan(<value>)```
+        - ```.notMoreThan(<value>) | lessThanOrEqual(<value>)```
+        - ```.notLessThan(<value>) | moreThanOrEqual(<value>)```
+                                => \[scores={```obj1```=```a```, ...}]
+- ```.atTeam(<name>)```     => \[team=```name```]
+- ```.notAtTeam(<name>)```  => \[team=!```name```]
+- ```.atAnyTeam()```        => \[team=]
+- ```.notAtAnyTeam()```     => \[team=!]
+- ```.limit(<value>)```     => \[limit=```val```]
+- ```.sort(<'nearest' | 'random' | 'furthest' | 'arbitrary'>) | nearest() | random() | furthest() | arbitrary()```
+                                => \[sort=```val```]
+- ```.level```
+    - ```.round```
+        - ```.from(<value>).to(<value>)```
+        - ```.is(<value>)```
+        - ```.moreThan(<value>)```
+        - ```.lessThan(<value>)```
+        - ```.notMoreThan(<value>) | lessThanOrEqual(<value>)```
+        - ```.notLessThan(<value>) | moreThanOrEqual(<value>)```
+                                => \[level=```a```..```b```]
+- ```.gamemodeIs(<mode>)``` => \[gamemode=```m```]
+- ```.gamemodeIsNot(<mode>)```
+                                => \[gamemode=!```m```]
+- ```.name(<name) | .nameIs(<name>)```
+                                => \[name=```n```]
+- ```.nameIsNot(<name>)```
+                                => \[name=!```n```]
+- ```.rotation```
+    - ```.x | .y```
         - ```.is(<value>)```
         - ```.round```
             - ```.from(<value>).to(<value>)```
@@ -150,55 +186,21 @@ d. 附加标签
             - ```.lessThan(<value>)```
             - ```.notMoreThan(<value>) | lessThanOrEqual(<value>)```
             - ```.notLessThan(<value>) | moreThanOrEqual(<value>)```
-                                => \[scores={```obj1```=```a```, ...}]
-    - ```.atTeam(<name>)```     => \[team=```name```]
-    - ```.notAtTeam(<name>)```  => \[team=!```name```]
-    - ```.atAnyTeam()```        => \[team=]
-    - ```.notAtAnyTeam()```     => \[team=!]
-    - ```.limit(<value>)```     => \[limit=```val```]
-    - ```.sort(<'nearest' | 'random' | 'furthest' | 'arbitrary'>) | nearest() | random() | furthest() | arbitrary()```
-                                => \[sort=```val```]
-    - ```.level```
-        - ```.round```
-            - ```.from(<value>).to(<value>)```
-            - ```.is(<value>)```
-            - ```.moreThan(<value>)```
-            - ```.lessThan(<value>)```
-            - ```.notMoreThan(<value>) | lessThanOrEqual(<value>)```
-            - ```.notLessThan(<value>) | moreThanOrEqual(<value>)```
-                                => \[level=```a```..```b```]
-    - ```.gamemodeIs(<mode>)``` => \[gamemode=```m```]
-    - ```.gamemodeIsNot(<mode>)```
-                                => \[gamemode=!```m```]
-    - ```.name(<name) | .nameIs(<name>)```
-                                => \[name=```n```]
-    - ```.nameIsNot(<name>)```
-                                => \[name=!```n```]
-    - ```.rotation```
-        - ```.x | .y```
-            - ```.is(<value>)```
-            - ```.round```
-                - ```.from(<value>).to(<value>)```
-                - ```.is(<value>)```
-                - ```.moreThan(<value>)```
-                - ```.lessThan(<value>)```
-                - ```.notMoreThan(<value>) | lessThanOrEqual(<value>)```
-                - ```.notLessThan(<value>) | moreThanOrEqual(<value>)```
                                 => \[x_rotation=```a```..```b```]
-    - ```.typeIs(<type>)```     => \[type=```t```]
-    - ```.typeIsNot(<type>)```  => \[type=!```t```]
-    - ```.typeTagIs(<type>)```
+- ```.typeIs(<type>)```         => \[type=```t```]
+- ```.typeIsNot(<type>)```      => \[type=!```t```]
+- ```.typeTagIs(<type>)```
                                 => \[type=#```t```]
-    - ```.typeTagIsNot(<type>)```
+- ```.typeTagIsNot(<type>)```
                                 => \[type=!#```t```]
-    - ```.tag(<tag>) | .tagIs(<tag>)```
+- ```.tag(<tag>) | .tagIs(<tag>)```
                                 => \[tag=```t```]
-    - ```.tagIsNot(<tag>)```
+- ```.tagIsNot(<tag>)```
                                 => \[tag=!```t```]
-    - ```.tagIsNotHaveAny()```  => \[tag=]
-    - ```.tagIsHaveAny()```     => \[tag=!]
-    - ```.nbtCompare(<nbt>)```  => \[nbt={```...```}]
-    - ```.advancementCompare(<adv>)```
+- ```.tagIsNotHaveAny()```      => \[tag=]
+- ```.tagIsHaveAny()```         => \[tag=!]
+- ```.nbtCompare(<nbt>)```      => \[nbt={```...```}]
+- ```.advancementCompare(<adv>)```
                                 => \[advancement={```...```}]
 
 5. 格式化数据
