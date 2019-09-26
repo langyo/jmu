@@ -8,7 +8,7 @@ The upgrade from JavaScript to MCFunction.
 
 - 从 V3 版本开始，JMU 以解析 AST 的形式转译指令，抛弃之前的模拟解析模式。
 - JMU 可接受文件夹层次类似于 Minecraft 函数包的 JavaScript 源代码项目，转译后写出的同样也是与所给函数包文件夹层次一致的行为包。
-- JMU 不存在来自于浏览器与 Node.js 的全局变量，仅有 JMU 提供的专用全局变量。部分 JavaScript 特性也可能会被改变或不可用。
+- 凡是用于操作 Minecraft 的 JavaScript 语句，其均以开头为 $ 的全局变量提供。
 
 ## 二、基本语法
 
@@ -16,27 +16,29 @@ The upgrade from JavaScript to MCFunction.
 
 #### a. 方块
 
-- ```at(<x>, <y>, <z>)```
+- ```$at(<x>, <y>, <z>)```
 
-- ```from(<x>, <y>, <z>).to(<x>, <y>, <z>)```
+- ```$from(<x>, <y>, <z>).to(<x>, <y>, <z>)```
 
 #### b. 实体
 
-- ```self```
+- ```$self | $s```
 
-- ```players | players.all```
+- ```$players | $players.all | $a```
 
-- ```players.random```
+- ```$players.random | $r```
 
-- ```players.nearest```
+- ```$players.nearest | $p```
 
-- ```entity | entities```
+- ```$entity | $entities | $e```
 
-- ```as(<selector>)```
+- ```$as(<selector>) | $(<selector>)```
 
   
 
 ### 2. 形容词
+
+形容词是用在选择器上的一类修饰参数，它可使得选择器可以缩小选择范围、精确选择具有特定属性的目标。它的使用方式为在选择器后紧跟一对方括号，内填一个或多个形容词，以逗号隔开。
 
 #### a.方位
 
@@ -126,7 +128,7 @@ JavaScript 原生的算术运算符、赋值运算符均会自动转换为一系
 
 在赋值时，计分板变量还可限制值的类型与按所给常量放缩数值，以后缀点表达式控制。例如，下面的表达式使得原本的```self[var2]```先转换为 byte 类型再放大到其 2 倍后再存储：
 
-```self[var1] = self[var2].toByte.scale(2);```
+```$self[var1] = $self[var2].toByte.scale(2);```
 
 可用的后缀表达式有：
 
@@ -190,11 +192,11 @@ nbt.creeper({ NoAI: true })
 
 基于世界的相对坐标表示：
 
-```tildes [ +|- <num> ]``` 或 ```~(<num>)```
+```$tildes [ +|- <num> ]``` 或 ```$~(<num>)```
 
 基于实体的相对坐标表示：
 
-```carets [ +|- <num>]``` 或 ```(void(0))^(<num>)```
+```$carets [ +|- <num>]``` 或 ```$^(<num>)```
 
 绝对坐标表示：
 
@@ -202,108 +204,116 @@ nbt.creeper({ NoAI: true })
 
 ### 6. 根指令
 
-- ```run(<namespace>, <command_path>)```
+- ```$run(<namespace>, <command_path>)```
     执行一个已定义的函数
-- ```run(<command_list>) | run(<single_command>)```
+- ```$run(<command_list>) | run(<single_command>)```
     临时定义一批指令并立即执行，相当于 lambda 函数或匿名函数
-- ```tell([who], <RAW_JSON>)[.to(<selector>)[.and(<selector>)...]]```
+- ```$tell([who], <RAW_JSON>)[.to(<selector>)[.and(<selector>)...]]```
     执行 tellraw，可通过后缀选择器指定多个接收者
-- ```say([selector, <RAW_JSON>])[.to(<selector>)[.and(<selector>)...]]```
+- ```$say([selector, <RAW_JSON>])[.to(<selector>)[.and(<selector>)...]]```
     执行 say，与 tellraw 类似
-- ```setBlock|setblock(<blockId>, <nbt>)```
+- ```$setBlock|setblock(<blockId>, <nbt>)```
     执行 setblock，其前需要方块位置主语；NBT 提示可通过工厂函数使 IDE 提供智能感知服务
     
     > 特化函数 setBlock$\<blockId>(\<nbt>)，可无需工厂函数就能体验到智能感知
-- ```fill(<blockId>, <nbt>).mode(<'destroy' | 'hollow' | 'keep' | 'outline' | 'replace'>)```
+- ```$fill(<blockId>, <nbt>).mode(<'destroy' | 'hollow' | 'keep' | 'outline' | 'replace'>)```
     执行 fill，其前需要方块范围主语
     
     > 特化函数 fill$\<blockId(\<nbt>)>，可无需工厂函数就能体验到智能感知
-- ```summon(<entity_selector_type>, <nbt>)```
+- ```$summon(<entity_selector_type>, <nbt>)```
     执行 summon，其前需要方块位置主语或实体主语
     
     > 特化函数 summon$\<entityId>(\<nbt>)，可无需工厂函数就能体验到智能感知
-- ```playSound|playsound(<sound_id>)[.voice(<num>)][.source(<type>)][.minVoice(<num>)][.grade(<level>)]```
-- ```stopSound|stopsound()```
+- ```$playSound|playsound(<sound_id>)[.voice(<num>)][.source(<type>)][.minVoice(<num>)][.grade(<level>)]```
+- ```$stopSound|stopsound()```
     执行 playsound/stopsound，其前可选择提供主语
     
     > source 为音源，grade 为音调，voice 和 minVoice 分别为默认音量和最小音量
-- ```time```
+- ```$time```
+    
     - ```.get()```          => time get
     - ```.set(<num>)```     => time set
         执行 time，不一定需要主语（带主语仅为转移执行者）
-- ```clone.from(<x>, <y>, <z>).to(<x>, <y>, <z>)[.mode('masked' | 'all')][.filter('replace' | 'masked' | 'filtered')][.sourceMode('normal' | 'force' | 'move')]```
+- ```$clone.from(<x>, <y>, <z>).to(<x>, <y>, <z>)[.mode('masked' | 'all')][.filter('replace' | 'masked' | 'filtered')][.sourceMode('normal' | 'force' | 'move')]```
     执行 clone，其前需要主语
     
     > 默认的 mode 为 all，默认的 filter 为 replace，默认的 sourceMode 为 normal
-- ```give(<item_id>, <nbt>)```
+- ```$give(<item_id>, <nbt>)```
     执行 give，其前需要玩家实体主语
-- ```clear(<item>, [count])```
+- ```$clear(<item>, [count])```
     执行 clear，其前需要玩家实体主语
     
     > 如果省略 count，默认为 0
-- ```title([selector], <RAW_JSON>)[.subTitle(<RAW_JSON>)[.to(<selector>)[.and(<selector>)...]]```
+- ```$title([selector], <RAW_JSON>)[.subTitle(<RAW_JSON>)[.to(<selector>)[.and(<selector>)...]]```
     执行 title，与 tellraw 类似
-- ```kill([selector])```
+- ```$kill([selector])```
     执行 kill；如果未指定目标，则直接作用于主语所选对象
-- ```objectives(<objective>)```
+- ```$objectives(<objective>)```
+    
     - ```.setDisplay(<type>)```
     - ```.setName(<name>)```
         执行 scoreboard objectives
         
         > 值得一提，JMU 会自动创建所有的编写者用过的计分板变量名，并加前缀以保证区分与其它包的变量（可通过在变量名开头加 # 阻止此行为）
-- ```datapack```
+- ```$datapack```
+    
     - ```enable(<name>)```
     - ```disable(<name>)```
         执行 datapack，无需主语
-- ```bossbar(<id>)```
+- ```$bossbar(<id>)```
+    
     - ```currentValue|value(<name>) | maxValue(<num>)```
     - ```setDisplay(<'notched_6' | 'notched_10' | 'notched_12' | 'notched_20' | 'progress'>)```
     - ```visible(<true | false>)```
     执行 bossbar，无需主语
-- ```advancement(<path>) | recipe(<path>)```
+- ```$advancement(<path>) | recipe(<path>)```
+    
     - ```give|grank(['all' | 'after' | 'before'])```
     - ```remove|revoke|take(['all' | 'after' | 'before'])```
         执行 advancement/recipe，需要主语
-- ```effect(<type>)[.for(<time>)]```
+- ```$effect(<type>)[.for(<time>)]```
     执行 effect，需要主语
     
     > 如果省略 for 子句，默认为尽可能长的时间（2 的 31 次方减一秒）
-- ```enchant(<type>).at(<item_pos>)```
+- ```$enchant(<type>).at(<item_pos>)```
     执行 enchant，需要主语
-- ```experience|exp|xp(<value>)```
-- ```experienceLevel|expLevel|xpLevel(<value>)```
+- ```$experience|exp|xp(<value>)```
+- ```$experienceLevel|expLevel|xpLevel(<value>)```
     执行 experience，需要主语
-- ```loot(<path>)[.at(<item_pos>)]```
+- ```$loot(<path>)[.at(<item_pos>)]```
     执行 loot，需要主语
     
     > 如果主语是个非玩家实体，必须要 at 子句，否则不得加子句
-- ```replace(<item_pos>)[.as(<item>, [nbt])]```
+- ```$replace(<item_pos>)[.as(<item>, [nbt])]```
     执行 replaceitem 需要主语
     
     > 如果不提供 as 子句，默认为 air 空气
-- ```seed()```
+- ```$seed()```
     执行 seed
-- ```schedule(<time>).run(<...>)```
-- ```scheduleSeconds(<time>).run(<...>)```
-- ```scheduleDays(<time>.run(<...>))```
+- ```$schedule(<time>).run(<...>)```
+- ```$scheduleSeconds(<time>).run(<...>)```
+- ```$scheduleDays(<time>.run(<...>))```
     执行 schedule 命令；必须带 run 子句
-- ```tag(<id>)```
+- ```$tag(<id>)```
+    
     - ```.give|add()```
     - ```.take|remove()```
         执行 tag 命令；必须要有主语
-- ```team(<id>)```
+- ```$team(<id>)```
+    
     - ```.join()```
     - ```.leave()```
     - ```.clear()```                （该子句无需主语）
     - ```.set(<status>, <value>)``` （该子句无需主语）
         执行 team 命令；全局子句不需要主语，个体子句必须要主语
-- ```tp|move|teleport (<selector>)|(<x>, <y>, <z>, [x_rotation], [y_rotation])```
+- ```$tp|move|teleport (<selector>)|(<x>, <y>, <z>, [x_rotation], [y_rotation])```
     执行 tp 命令，需要主语
-- ```spread(<x>, <z>).range(<num>).spacing(<num>)[.teamMeet()]```
+- ```$spread(<x>, <z>).range(<num>).spacing(<num>)[.teamMeet()]```
     执行 spreadplayers 命令，无需主语
     
     > range 表示分散最大范围，spacing 为最小间距，teamMeet 为是否同队实体传送在一起
-- ```loadChunk|forceLoad|forceload(<x>, <z>)```
+- ```$loadChunk|forceLoad|forceload(<x>, <z>)```
+    
     - ```.load()```
     - ```.remove()```
     - ```.removeAll()```
@@ -313,4 +323,20 @@ nbt.creeper({ NoAI: true })
 
 ## 三、补充细节
 
-> 待编辑
+#### 1. 常量表达式警告
+
+请一定记住，JMU 并不是一个能使 Minecraft 可以执行 JavaScript 的引擎，而是一个用于将 JavaScript 转换到 Minecraft 可执行的指令序列的转译器。这也就意味着，即使 JavaScript 是一门极为灵活的动态语言，也不能跳出 Minecraft 指令力所能及的框架。例如，你不能访问自定义的 NBT 路径、你不能拼接已经写进 NBT 内的字符串，等等。在遇到这类错误时，JMU 会自动终止转译。
+
+不过，经过 JMU 转译后相当于常量的字面量不会因此而中止转译，例如：
+
+1. ```"Hello, " + "world!"```
+2. ```((n) => tellraw($players, [n]))(123 + 233);```
+3. ```round(1, 128).filter(n => n % 2 == 0).map(n => $self["storage" + n] = 0);```
+
+对于第二个例子，如果传入的其中任意一个参数相当于常量，那么函数执行时也会视此参数为常量。这种特性适用于制作用于生成模板指令的工厂函数，进而供人作为库调用。
+
+对于第三个例子，```round```、```filter```和```map```时 JMU 中仅有的用于批量生成常量的安徽念书，它们会被作为 JavaScript 语句运行，而不会转换为指令序列。
+
+#### 2. 无引用、全部传参与建立新变量均使用值传递的警告
+
+如果调用 Minecraft 函数时传入了计分板变量或 NBT 路径，它会以值传递；如果要传入引用（类似 C++ 的引用），需要以 ```ref``` 包裹。
