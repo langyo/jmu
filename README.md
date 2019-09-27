@@ -22,17 +22,17 @@ The upgrade from JavaScript to MCFunction.
 
 #### b. 实体
 
-- ```$self | $s```
+- ``` $s```
 
-- ```$players | $players.all | $a```
+- ```$a```
 
-- ```$players.random | $r```
+- ```$r```
 
-- ```$players.nearest | $p```
+- ```$p```
 
-- ```$entity | $entities | $e```
+- ```$e```
 
-- ```$as(<selector>) | $(<selector>)```
+- ```$(<selector>)```
 
   
 
@@ -102,25 +102,25 @@ JavaScript 原生的逻辑二元运算符、```if```语句、```switch```语句�
 
 - ```<selector> // 存在则为真，不存在则为假```
 
-- ```at(<x>, <y>, <z>) ==|!= at(<x>, <y>, <z>)|<blockName>```
+- ```$at(<x>, <y>, <z>) ==|!= $at(<x>, <y>, <z>)|<blockName>```
 
-- ```from(<x>, <y>, <z>).to(<x>, <y>, <z>) ==|!= at(<x>, <y>, <z>)```
+- ```$from(<x>, <y>, <z>).to(<x>, <y>, <z>) ==|!= $at(<x>, <y>, <z>)```
 
 - ```<selector><path> // 存在则为真，不存在则为假```
 
-- ```at(<x>, <y>, <z>)<path> // 存在则为真，不存在则为假```
+- ```$at(<x>, <y>, <z>)<path> // 存在则为真，不存在则为假```
 
 ```switch```语句仅可使用：
 
 - ```<expr>```
 
-- ```at(<x>, <y>, <z>)```
+- ```$at(<x>, <y>, <z>)```
 
-- ```from(<x>, <y>, <z>).to(<x>, <y>, <z>)```
+- ```$from(<x>, <y>, <z>).to(<x>, <y>, <z>)```
 
 - ```<selector><path>```
 
-- ```at(<x>, <y>, <z>)<path>```
+- ```$at(<x>, <y>, <z>)<path>```
 
 #### b. 赋值与表达式
 
@@ -230,7 +230,7 @@ nbt.creeper({ NoAI: true })
     
     > source 为音源，grade 为音调，voice 和 minVoice 分别为默认音量和最小音量
 - ```$time```
-    
+  
     - ```.get()```          => time get
     - ```.set(<num>)```     => time set
         执行 time，不一定需要主语（带主语仅为转移执行者）
@@ -249,25 +249,25 @@ nbt.creeper({ NoAI: true })
 - ```$kill([selector])```
     执行 kill；如果未指定目标，则直接作用于主语所选对象
 - ```$objectives(<objective>)```
-    
+  
     - ```.setDisplay(<type>)```
     - ```.setName(<name>)```
         执行 scoreboard objectives
         
         > 值得一提，JMU 会自动创建所有的编写者用过的计分板变量名，并加前缀以保证区分与其它包的变量（可通过在变量名开头加 # 阻止此行为）
 - ```$datapack```
-    
+  
     - ```enable(<name>)```
     - ```disable(<name>)```
         执行 datapack，无需主语
 - ```$bossbar(<id>)```
-    
+  
     - ```currentValue|value(<name>) | maxValue(<num>)```
     - ```setDisplay(<'notched_6' | 'notched_10' | 'notched_12' | 'notched_20' | 'progress'>)```
     - ```visible(<true | false>)```
     执行 bossbar，无需主语
 - ```$advancement(<path>) | recipe(<path>)```
-    
+  
     - ```give|grank(['all' | 'after' | 'before'])```
     - ```remove|revoke|take(['all' | 'after' | 'before'])```
         执行 advancement/recipe，需要主语
@@ -295,12 +295,12 @@ nbt.creeper({ NoAI: true })
 - ```$scheduleDays(<time>.run(<...>))```
     执行 schedule 命令；必须带 run 子句
 - ```$tag(<id>)```
-    
+  
     - ```.give|add()```
     - ```.take|remove()```
         执行 tag 命令；必须要有主语
 - ```$team(<id>)```
-    
+  
     - ```.join()```
     - ```.leave()```
     - ```.clear()```                （该子句无需主语）
@@ -313,7 +313,7 @@ nbt.creeper({ NoAI: true })
     
     > range 表示分散最大范围，spacing 为最小间距，teamMeet 为是否同队实体传送在一起
 - ```$loadChunk|forceLoad|forceload(<x>, <z>)```
-    
+  
     - ```.load()```
     - ```.remove()```
     - ```.removeAll()```
