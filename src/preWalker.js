@@ -33,7 +33,7 @@ const compareObject = (obj, template) => {
  * MCScoreboardVariantTransfrom     // 用在 data 指令的 byte, int 这些类型，以及放缩常量 scale
  */
 
-const template = {
+const templateBefore = {
     selectors: {
         blockFromTo: {
             "type": "ExpressionStatement",
@@ -111,13 +111,16 @@ const template = {
                 "name": "$e"
             }
         }
-    },
+    }
+};
+
+const templateAfter = {
     selectorArguments: {
 
     }
 };
 
-const templateEvaluator = ({
+const templateEvaluatorBefore = {
     selectors: {
         blockFromTo: n => ({
             type: "MCSelector",
@@ -175,18 +178,21 @@ const templateEvaluator = ({
             fromMC: true,
             kind: 'entity'
         })
-    },
+    }
+};
+
+const templateEvaluatorAfter = {
     selectorArguments: {
 
     }
-});
+};
 
 var dfs = n => {
     if(!n) return null;
 
-    for (let i of Object.keys(template))
-        for (let j of Object.keys(template[i]))
-            if (compareObject(n, template[i][j])) return templateEvaluator[i][j](n);
+    for (let i of Object.keys(templateBefore))
+        for (let j of Object.keys(templateBefore[i]))
+            if (compareObject(n, templateBefore[i][j])) return templateEvaluatorBefore[i][j](n);
 
     switch (n.type) {
         // ES5
@@ -293,4 +299,11 @@ var dfs = n => {
             n.value = dfs(n.value);
             return n;
     }
+
+    for (let i of Object.keys(templateAfter))
+        for (let j of Object.keys(templateAfter[i]))
+            if (compareObject(n, templateAfter[i][j])) return templateEvaluatorAfter[i][j](n);
+
+
+    throw new Error("未知错误");
 }
