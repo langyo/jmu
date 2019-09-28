@@ -65,7 +65,55 @@ const template = {
                     "name": "$at"
                 }
             }
+        },
+        entityAt: {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "CallExpression",
+                "callee": {
+                    "type": "Identifier",
+                    "name": "$"
+                }
+            }
+        },
+        entitySelf: {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "Identifier",
+                "name": "$s"
+            }
+        },
+        entityAll: {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "Identifier",
+                "name": "$a"
+            }
+        },
+        entityRandom: {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "Identifier",
+                "name": "$r"
+            }
+        },
+        entityNearest: {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "Identifier",
+                "name": "$p"
+            }
+        },
+        entity: {
+            "type": "ExpressionStatement",
+            "expression": {
+                "type": "Identifier",
+                "name": "$e"
+            }
         }
+    },
+    selectorArguments: {
+
     }
 };
 
@@ -73,7 +121,8 @@ const templateEvaluator = ({
     selectors: {
         blockFromTo: n => ({
             type: "MCSelector",
-            kind: 'fromTo',
+            fromMC: true,
+            kind: 'block_from_to',
             from: {
                 x: dfs(n.expression.callee.arguments[0]),
                 y: dfs(n.expression.callee.arguments[1]),
@@ -87,23 +136,60 @@ const templateEvaluator = ({
         }),
         blockAt: n => ({
             type: "MCSelector",
-            kind: 'at',
+            fromMC: true,
+            kind: 'block_at',
             at: {
                 x: dfs(n.arguments[0]),
                 y: dfs(n.arguments[1]),
                 z: dfs(n.arguments[2])
             }
+        }),
+        entityAt: n => ({
+            type: "MCSelector",
+            fromMC: true,
+            kind: 'entity_at',
+            at: dfs(n.arguments[0])
+        }),
+        entitySelf: n => ({
+            type: "MCSelector",
+            fromMC: true,
+            kind: 'entity_self'
+        }),
+        entityAll: n => ({
+            type: "MCSelector",
+            fromMC: true,
+            kind: 'entity_all'
+        }),
+        entityRandom: n => ({
+            type: "MCSelector",
+            fromMC: true,
+            kind: 'entity_random'
+        }),
+        entityNearest: n => ({
+            type: "MCSelector",
+            fromMC: true,
+            kind: 'entity_nearest'
+        }),
+        entity: n => ({
+            type: "MCSelector",
+            fromMC: true,
+            kind: 'entity'
         })
+    },
+    selectorArguments: {
+
     }
-}).map(n => n.map(n => Object.assign(n, { fromMC: true })));
+});
 
 var dfs = n => {
+    if(!n) return null;
+
     for (let i of Object.keys(template))
         for (let j of Object.keys(template[i]))
             if (compareObject(n, template[i][j])) return templateEvaluator[i][j](n);
+
     switch (n.type) {
         // ES5
-
         case 'Program':
         case 'BlockStatement':
         case 'FunctionBody':
@@ -122,7 +208,7 @@ var dfs = n => {
             n.body = dfs(n.body);
             return n;
         case 'ReturnStatement':
-            n.arguments= dfs(n.arguments);
+            n.arguments = dfs(n.arguments);
             return n;
         case 'VariableDeclaration':
             n.declarations = dfs(n.declarations);
@@ -169,7 +255,6 @@ var dfs = n => {
             return n;
 
         // ES2015
-
         case 'ArrowFunctionExpression':
             n.body = dfs(n.body);
             return n;
