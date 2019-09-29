@@ -22,7 +22,7 @@ The upgrade from JavaScript to MCFunction.
 
 #### b. 实体
 
-- ``` $s```
+- ```$s```
 
 - ```$a```
 
@@ -31,10 +31,6 @@ The upgrade from JavaScript to MCFunction.
 - ```$p```
 
 - ```$e```
-
-- ```$(<selector>)```
-
-  
 
 ### 2. 形容词
 
@@ -46,9 +42,9 @@ The upgrade from JavaScript to MCFunction.
 
 - ```x, y, z = <num>```
 
-- ```x, y, z, distance = round(<num> | -NaN, <num> | +NaN)```
+- ```distance = round(<num> | -NaN, <num> | +NaN)```
 
-- ```x, y, z, dx, dy, dz = <num>```
+- ```dx, dy, dz = <num>```
 
 #### b. 朝向
 
@@ -204,89 +200,72 @@ nbt.creeper({ NoAI: true })
 
 ### 6. 根指令
 
-- ```$run(<namespace>, <command_path>)```
+- ```$run(<command_path_string>)```
     执行一个已定义的函数
-- ```$run(<command_list>) | run(<single_command>)```
+- ```$run(<command_list> | <single_command>)```
     临时定义一批指令并立即执行，相当于 lambda 函数或匿名函数
-- ```$tell([who], <RAW_JSON>)[.to(<selector>)[.and(<selector>)...]]```
-    执行 tellraw，可通过后缀选择器指定多个接收者
-- ```$say([selector, <RAW_JSON>])[.to(<selector>)[.and(<selector>)...]]```
-    执行 say，与 tellraw 类似
-- ```$setBlock|setblock(<blockId>, <nbt>)```
+- ```tell([who], <RAW_JSON>)```
+    执行 tellraw，需要主语
+- ```setBlock|setblock(<blockId>, <nbt>)```
     执行 setblock，其前需要方块位置主语；NBT 提示可通过工厂函数使 IDE 提供智能感知服务
-    
     > 特化函数 setBlock$\<blockId>(\<nbt>)，可无需工厂函数就能体验到智能感知
-- ```$fill(<blockId>, <nbt>).mode(<'destroy' | 'hollow' | 'keep' | 'outline' | 'replace'>)```
+- ```fill(<blockId>, <nbt>).mode(<'destroy' | 'hollow' | 'keep' | 'outline' | 'replace'>)```
     执行 fill，其前需要方块范围主语
-    
     > 特化函数 fill$\<blockId(\<nbt>)>，可无需工厂函数就能体验到智能感知
-- ```$summon(<entity_selector_type>, <nbt>)```
+- ```summon(<entity_selector_type>, <nbt>)```
     执行 summon，其前需要方块位置主语或实体主语
-    
     > 特化函数 summon$\<entityId>(\<nbt>)，可无需工厂函数就能体验到智能感知
-- ```$playSound|playsound(<sound_id>)[.voice(<num>)][.source(<type>)][.minVoice(<num>)][.grade(<level>)]```
-- ```$stopSound|stopsound()```
+- ```playSound|playsound(<sound_id>)[.voice(<num>)][.source(<type>)][.minVoice(<num>)][.grade(<level>)]```
+- ```stopSound|stopsound()```
     执行 playsound/stopsound，其前可选择提供主语
-    
     > source 为音源，grade 为音调，voice 和 minVoice 分别为默认音量和最小音量
 - ```$time```
-  
     - ```.get()```          => time get
     - ```.set(<num>)```     => time set
-        执行 time，不一定需要主语（带主语仅为转移执行者）
-- ```$clone.from(<x>, <y>, <z>).to(<x>, <y>, <z>)[.mode('masked' | 'all')][.filter('replace' | 'masked' | 'filtered')][.sourceMode('normal' | 'force' | 'move')]```
+        执行 time，不需要主语
+- ```clone.from(<x>, <y>, <z>).to(<x>, <y>, <z>)[.mode('masked' | 'all')][.filter('replace' | 'masked' | 'filtered')][.sourceMode('normal' | 'force' | 'move')]```
     执行 clone，其前需要主语
-    
     > 默认的 mode 为 all，默认的 filter 为 replace，默认的 sourceMode 为 normal
-- ```$give(<item_id>, <nbt>)```
+- ```give(<item_id>, [count], [nbt])```
     执行 give，其前需要玩家实体主语
-- ```$clear(<item>, [count])```
+- ```clear(<item>, [count])```
     执行 clear，其前需要玩家实体主语
-    
     > 如果省略 count，默认为 0
-- ```$title([selector], <RAW_JSON>)[.subTitle(<RAW_JSON>)[.to(<selector>)[.and(<selector>)...]]```
+- ```title([selector], <RAW_JSON>)[.subTitle(<RAW_JSON>)```
     执行 title，与 tellraw 类似
-- ```$kill([selector])```
+- ```kill()```
     执行 kill；如果未指定目标，则直接作用于主语所选对象
-- ```$objectives(<objective>)```
-  
+- ```$objective(<objective>)```
     - ```.setDisplay(<type>)```
     - ```.setName(<name>)```
         执行 scoreboard objectives
-        
         > 值得一提，JMU 会自动创建所有的编写者用过的计分板变量名，并加前缀以保证区分与其它包的变量（可通过在变量名开头加 # 阻止此行为）
 - ```$datapack```
-  
     - ```enable(<name>)```
     - ```disable(<name>)```
         执行 datapack，无需主语
 - ```$bossbar(<id>)```
-  
     - ```currentValue|value(<name>) | maxValue(<num>)```
     - ```setDisplay(<'notched_6' | 'notched_10' | 'notched_12' | 'notched_20' | 'progress'>)```
     - ```visible(<true | false>)```
     执行 bossbar，无需主语
-- ```$advancement(<path>) | recipe(<path>)```
-  
+- ```advancement(<path>) | recipe(<path>)```
     - ```give|grank(['all' | 'after' | 'before'])```
     - ```remove|revoke|take(['all' | 'after' | 'before'])```
         执行 advancement/recipe，需要主语
-- ```$effect(<type>)[.for(<time>)]```
+- ```effect(<type>)[.for(<time>)]```
     执行 effect，需要主语
-    
     > 如果省略 for 子句，默认为尽可能长的时间（2 的 31 次方减一秒）
-- ```$enchant(<type>).at(<item_pos>)```
+- ```enchant(<type>).at(<item_pos>)```
     执行 enchant，需要主语
-- ```$experience|exp|xp(<value>)```
-- ```$experienceLevel|expLevel|xpLevel(<value>)```
+- ```experience|exp|xp(<value>)```
+- ```experienceLevel|expLevel|xpLevel(<value>)```
     执行 experience，需要主语
-- ```$loot(<path>)[.at(<item_pos>)]```
+- ```loot(<path>)[.at(<item_pos>)]```
     执行 loot，需要主语
-    
     > 如果主语是个非玩家实体，必须要 at 子句，否则不得加子句
-- ```$replace(<item_pos>)[.as(<item>, [nbt])]```
+- ```replace(<item_pos>)[.as(<item>, [nbt])]```
     执行 replaceitem 需要主语
-    
     > 如果不提供 as 子句，默认为 air 空气
 - ```$seed()```
     执行 seed
@@ -294,32 +273,30 @@ nbt.creeper({ NoAI: true })
 - ```$scheduleSeconds(<time>).run(<...>)```
 - ```$scheduleDays(<time>.run(<...>))```
     执行 schedule 命令；必须带 run 子句
-- ```$tag(<id>)```
-  
+- ```tag(<id>)```
     - ```.give|add()```
     - ```.take|remove()```
         执行 tag 命令；必须要有主语
-- ```$team(<id>)```
-  
+- ```team(<id>)```
     - ```.join()```
     - ```.leave()```
     - ```.clear()```                （该子句无需主语）
     - ```.set(<status>, <value>)``` （该子句无需主语）
         执行 team 命令；全局子句不需要主语，个体子句必须要主语
-- ```$tp|move|teleport (<selector>)|(<x>, <y>, <z>, [x_rotation], [y_rotation])```
+- ```tp|move|teleport (<selector>)|(<x>, <y>, <z>, [x_rotation], [y_rotation])```
     执行 tp 命令，需要主语
 - ```$spread(<x>, <z>).range(<num>).spacing(<num>)[.teamMeet()]```
     执行 spreadplayers 命令，无需主语
-    
     > range 表示分散最大范围，spacing 为最小间距，teamMeet 为是否同队实体传送在一起
 - ```$loadChunk|forceLoad|forceload(<x>, <z>)```
-  
     - ```.load()```
     - ```.remove()```
     - ```.removeAll()```
         执行 forceload 命令，无需主语
-        
         > 对于 removeAll 子句，开头无需参数
+- ```particle(<type>, [...extra_arguments], <dx>, <dy>, <dz>, <speed>, <quantity>, <mode>)[.to(<selector>)]```
+    执行 particle 命令，需要坐标主语
+    > 一些特殊的粒子需要额外的参数
 
 ## 三、补充细节
 
