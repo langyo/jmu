@@ -1,7 +1,7 @@
 import { Expression } from 'meriyah/dist/estree';
 import { ScoreboardVariant } from './variantParser';
 
-export interface MCExpression extends Expression {}
+export interface MCExpression { }
 
 export interface UnaryExpression extends MCExpression {
     type: 'MCUnaryExpression';

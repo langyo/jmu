@@ -3,7 +3,7 @@ import { Selector } from './selector';
 import { ScoreboardVariant, NBTPath } from './variantParser';
 import { NBTGlobal, Block, Entity, Item , BlockType, EntityType, SoundType, ItemType, EffectType, EnchantType, ItemPosition, PracticleType} from '../utils/nbtStructure';
 
-export interface MCCommand extends Expression {
+export interface MCCommand {
     type: 'MCCommandCall';
 }
 
