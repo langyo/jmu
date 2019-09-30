@@ -1,4 +1,4 @@
-import { Expression } from 'meriyah/dist/estree';
+import { Expression, Identifier } from 'meriyah/dist/estree';
 import { Selector } from './selector';
 
 export interface NBTPath {
@@ -17,4 +17,15 @@ export interface ScoreboardVariant {
 export interface ScoreboardVariantTransform {
     transformTo?: 'byte' | 'short' | 'int' | 'long' | 'float' | 'double';
     scale?: number;
+}
+
+export interface VariableDeclaration {
+    type: 'MCVariableDeclartion';
+    declarations: [ VariableDeclarator ];
+}
+
+export interface VariableDeclarator {
+    type: 'MCVariableDeclarator';
+    id: Identifier;
+    init: ScoreboardVariant;
 }

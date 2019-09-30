@@ -7,12 +7,6 @@ export interface MCCommand {
     type: 'MCCommandCall';
 }
 
-export interface CommandRun extends MCCommand {
-    kind: 'run';
-    mode: 'declare' | 'single' | 'list';    // declare 为执行已有指令，single 和 list 分别为执行单个和顺序执行多个指令
-    value: string | Expression | [Expression];
-}
-
 export interface CommandTell extends MCCommand {
     kind: 'tell';
     selector: Selector;
@@ -87,12 +81,6 @@ export interface CommandPlaySound extends MCCommand {
     grade?: number;
 }
 
-export interface CommandTime extends MCCommand {
-    kind: 'time';
-    mode: 'get' | 'set';
-    value?: number;
-}
-
 export interface CommandClone extends MCCommand {
     kind: 'clone';
     selector: Selector;
@@ -131,24 +119,6 @@ export interface CommandKill extends MCCommand {
     selector: Selector;
 }
 
-export interface CommandObjective extends MCCommand {
-    kind: 'objective';
-    mode: 'setDisplay' | 'setName';
-    value: string;
-}
-
-export interface CommandDatapack extends MCCommand {
-    kind: 'datapack';
-    mode: 'enable' | 'disable';
-    value: string;
-}
-
-export interface CommandBossBar extends MCCommand {
-    kind: 'bossbar';
-    mode: 'value' | 'maxValue' | 'display' | 'visible';
-    value?: string;
-}
-
 export interface CommandAdvancement extends MCCommand {
     kind: 'advancement';
     selector: Selector;
@@ -184,17 +154,6 @@ export interface CommandLoot extends MCCommand {
     at?: ItemPosition;
 }
 
-export interface CommandSeed extends MCCommand {
-    kind: 'seed';
-}
-
-export interface CommandSchedule extends MCCommand {
-    kind: 'schedule';
-    length: number;
-    mode: 'day' | 'seconds' | 'minute';
-    command: string | [Expression];
-}
-
 export interface CommandTag extends MCCommand {
     kind: 'tag';
     selector: Selector;
@@ -221,22 +180,6 @@ export interface CommandTp extends MCCommand {
     };
 }
 
-export interface CommandSpread extends MCCommand {
-    kind: 'spread';
-    x: number;
-    y: number;
-    range: number;
-    spacing: number;
-    teamMeet?: boolean;
-}
-
-export interface CommandLoadChunk extends MCCommand {
-    kind: 'forceload';
-    x?: number;
-    y?: number;
-    mode: 'load' | 'remove' | 'removeAll';
-}
-
 export interface CommandParticle extends MCCommand {
     kind: 'particle';
     selector: Selector;
@@ -256,4 +199,63 @@ export interface CommandParticle extends MCCommand {
     quantity?: number;
     mode?: 'force' | 'normal';
     to?: Selector;
+}
+
+export interface CommandRun extends MCCommand {
+    kind: 'run';
+    mode: 'declare' | 'single' | 'list';    // declare 为执行已有指令，single 和 list 分别为执行单个和顺序执行多个指令
+    value: string | Expression | [Expression];
+}
+
+export interface CommandTime extends MCCommand {
+    kind: 'time';
+    mode: 'get' | 'set';
+    value?: number;
+}
+
+export interface CommandObjective extends MCCommand {
+    kind: 'objective';
+    mode: 'setDisplay' | 'setName';
+    value: string;
+}
+
+export interface CommandDatapack extends MCCommand {
+    kind: 'datapack';
+    mode: 'enable' | 'disable';
+    value: string;
+}
+
+export interface CommandBossBar extends MCCommand {
+    kind: 'bossbar';
+    mode: 'value' | 'maxValue' | 'display' | 'visible';
+    value?: string;
+}
+
+export interface CommandSeed extends MCCommand {
+    kind: 'seed';
+}
+
+export interface CommandSchedule extends MCCommand {
+    kind: 'schedule';
+    length: number;
+    mode: 'day' | 'seconds' | 'minute';
+    command: string | [Expression];
+}
+
+
+
+export interface CommandSpread extends MCCommand {
+    kind: 'spread';
+    x: number;
+    y: number;
+    range: number;
+    spacing: number;
+    teamMeet?: boolean;
+}
+
+export interface CommandLoadChunk extends MCCommand {
+    kind: 'forceload';
+    x?: number;
+    y?: number;
+    mode: 'load' | 'remove' | 'removeAll';
 }
