@@ -10,6 +10,7 @@ const compareObject = require('./utils/compareObject');
  * MCNBTPath
  * MCScoreboardVariant
  * MCScoreboardVariantTransform     // 用在 data 指令的 byte, int 这些类型，以及放缩常量 scale
+ * MCVariableDeclaration            // 定义、初始化
  * ------
  * MCUnaryExpression                // 一元运算
  * MCBinaryExpression               // 二元运算
@@ -19,18 +20,17 @@ const compareObject = require('./utils/compareObject');
  * ------
  * MCCommandCall
  * ------
- * MCVariableDeclaration            // 定义、初始化
- * ------
  * MCIfStatement
  * MCUnlessStatement
  * MCWhileStatement
  * MCDoWhileStatement
  * MCForStatement
+ * MCSwitchStatement
  * ------
  * MCInitialization                 // 在文件最外围的 "init" 或 "ticks"，分别用于表示初始化时执行的函数与随游戏刻循环运行的函数
  */
 
-var dfs = n => {
+export const dfs = n => {
     if(!n) return null;
 
     for (let i of Object.keys(templateBefore))
@@ -145,3 +145,13 @@ var dfs = n => {
 
     throw new Error("未知错误");
 }
+
+let templates = [
+    require('./preWalker/selector')(dfs),
+    require('./preWalker/selectorArguments')(dfs),
+    require('./preWalker/variantParser')(dfs),
+    require('./preWalker/expression')(dfs),
+    require('./preWalker/commandCall')(dfs),
+    require('./preWalker/logicStatement')(dfs),
+    require('./preWalker/initialization')(dfs)
+];
