@@ -124,5 +124,6 @@ module.exports = dfs => {
         for(let i of Object.keys(templates)) {
             if(compareObject(n, templates[i])) return templateEvaluators[i](n);
         }
+        return null;
     }
 };

@@ -33,9 +33,10 @@ const compareObject = require('./utils/compareObject');
 export const dfs = n => {
     if(!n) return null;
 
-    for (let i of Object.keys(templateBefore))
-        for (let j of Object.keys(templateBefore[i]))
-            if (compareObject(n, templateBefore[i][j])) return templateEvaluatorBefore[i][j](n);
+    for(const i of templates) {
+        let ret = i(n);
+        if(ret) return ret;
+    }
 
     switch (n.type) {
         // ES5
@@ -44,106 +45,106 @@ export const dfs = n => {
         case 'FunctionBody':
         case 'LabeledStatement':
             n.body.map(n => dfs(n));
-            return n;
+            break;
         case 'Function':
             n.params.map(n => dfs(n));
             n.body = dfs(n.body);
-            return n;
+            break;
         case 'ExpressionStatement':
             n.expression = dfs(n.expression);
-            return n;
+            break;
         case 'WithStatement':
             n.object = dfs(n.object);
             n.body = dfs(n.body);
-            return n;
+            break;
         case 'ReturnStatement':
             n.arguments = dfs(n.arguments);
-            return n;
+            break;
         case 'VariableDeclaration':
             n.declarations = dfs(n.declarations);
-            return n;
+            break;
         case 'VariableDeclarator':
             n.init = dfs(n.init);
             n.id = dfs(n.id);
-            return n;
+            break;
         case 'ArrayExpression':
             n.elements.map(n => dfs(n));
-            return n;
+            break;
         case 'ObjectExpression':
             n.properties.map(n => dfs(n));
-            return n;
+            break;
         case 'Property':
             n.value = dfs(n.value);
-            return n;
+            break;
         case 'UnaryExpression':
         case 'UpdateExpression':
             n.argument = dfs(n.argument);
-            return n;
+            break;
         case 'BinaryExpression':
         case 'AssignmentExpression':
         case 'LogicalExpression':
             n.left = dfs(n.left);
             n.right = dfs(n.right);
-            return n;
+            break;
         case 'MemberExpression':
             n.object = dfs(n.object);
             n.property = dfs(n.property);
-            return n;
+            break;
         case 'ConditionalExpression':
             n.test = dfs(n.test);
             n.alternate = dfs(n.alternate);
             n.consequent = dfs(n.consequent);
-            return n;
+            break;
         case 'CallExpression':
         case 'NewExpression':
             n.callee = dfs(n.callee);
             n.arguments.map(n => dfs(n));
-            return n;
+            break;
         case 'SequenceExpression':
             n.expressions.map(n => dfs(n));
-            return n;
+            break;
 
         // ES2015
         case 'ArrowFunctionExpression':
             n.body = dfs(n.body);
-            return n;
+            break;
         case 'YieldExpression':
             n.argument = dfs(n.argument);
-            return n;
+            break;
         case 'TemplateLiteral':
             n.quasis.map(n => dfs(n));
             n.expressions.map(n => dfs(n));
-            return n;
+            break;
         case 'TaggedTemplateExpression':
             n.tag = dfs(n.tag);
             n.quasi = dfs(n.quasi);
-            return n;
+            break;
         case 'AssignmentProperty':
             n.value = dfs(n.value);
-            return n;
+            break;
         case 'ObjectPattern':
             n.properties.map(n => dfs(n));
-            return n;
+            break;
         case 'ArrayPattern':
             n.elements.map(n => dfs(n));
-            return n;
+            break;
         case 'RestElement':
             n.argument = dfs(n.argument);
-            return n;
+            break;
         case 'AssignmentPattern':
             n.left = dfs(n.left);
             n.right = dfs(n.right);
-            return n;
+            break;
         case 'ClassBody':
             n.body.map(n => dfs(n));
-            return n;
+            break;
         case 'MethodDefinition':
             n.key = dfs(n.key);
             n.value = dfs(n.value);
-            return n;
+            break;
     }
 
-    throw new Error("未知错误");
+    return n;
 }
 
 let templates = [
