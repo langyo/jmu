@@ -10,16 +10,18 @@
     "@babel/plugin-proposal-decorators": "^7.4.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
+    "babel-plugin-tester": "^8.0.1",
     "babel-traverse": "^6.26.0",
     "babel-types": "^6.26.0",
     "babylon": "^6.18.0",
-    "jest": "^24.8.0",
-    "meriyah": "^1.7.2",
-    "shortid": "^2.2.15"
+    "jest": "^24.8.0"
   },
   "devDependencies": {},
+  "jest": {
+    "testRegex": "/test/.*\\.js$"
+  },
   "scripts": {
-    "start": "babel-node ./src/index.js",
+    "start": "babel-node ./exports.js",
     "test": "jest --watch"
   },
   "repository": {

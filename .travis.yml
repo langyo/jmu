@@ -1,0 +1,5 @@
+language: node
+node_js: 
+  - '11'
+install: 'npm install'
+script: 'npm run test'
