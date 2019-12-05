@@ -115,10 +115,16 @@ export default ({ type: t }) => ({
                       t.objectExpression([])
                     ]
                   ));
+                  return;
                 }
                 
               // Block selector
               case 'from':
+                // $.from(xx, xx, xx).to(xx, xx, xx)
+                // Verify the schedule.
+                
+
+              case 'at':
 
               // Unknown type handle
               default:
