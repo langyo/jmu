@@ -1,138 +1,99 @@
-import enumData from './enum';
+import t from 'babel-types';
 
-/**
- * Please note that this plugin just only translate the special JavaScript grammar.
- */
+class Tag {
 
-export default ({ type: t }) => ({
-  visitor: {
-    Identifier(path, state) {
-      if (path.get('name') === '$') {
-        if (path.parent.isMemberExpression()) {
-          const typeNode = path.parent;
-          if (typeNode.computed && typeNode.property.isIdentifier()) {
-            // $.xx
-            const type = typeNode.property.name;
-            switch (type) {
-              // Entity selector
-              case 'a': case 'all':
-              case 'r': case 'random':
-              case 's': case 'self':
-              case 'p': case 'nearest':
-              case 'e': case 'entity': case 'entities':
-                const currentlyType = type === 'a' ? 'all' :
-                  type === 'r' ? 'random' :
-                    type === 's' ? 'self' :
-                      type === 'e' || type === 'entities' ? 'entity' : type;
-                if (typeNode.parent.isCallExpression()) {
-                  // $.xx(xx)
-                  const argsNode = typeNode.parent;
+};
 
-                  // Verify and analyze the selector's argument.
-                  for (let arg of argsNode.arguments) {
-                    if (!arg.isBinaryExpression() ||
-                      (arg.get('right').isBinaryExpression() ?
-                        (!(
-                          arg.get('left.right').isIdentifier() &&
-                          (
-                            ['<=', '<'].indexOf(arg.get('operator')) >= 0 &&
-                            ['<=', '<'].indexOf(arg.get('left.operator')) >= 0 ||
-                            ['>=', '>'].indexOf(arg.get('operator')) >= 0 &&
-                            ['>=', '>'].indexOf(arg.get('left.operator')) >= 0
-                          )
-                        )) :
-                        (!(
-                          arg.get('left').isIdentifier() &&
-                          enumData.selectorArgumentKeys.indexOf(arg.get('left.name')) >= 0 &&
-                          ['<=', '<', '>=', '>', '==', '!=', '='].indexOf(arg.get('operator')) >= 0
-                        ))
-                      )
-                    ) throw arg.buildCodeFrameError('Unknown argument type!');
-                  }
-
-                  let args = argsNode.arguments.reduce((prev, next) => ({
-                    ...prev,
-                    [next.get('left').isBinaryExpression() ? next.get('left.right.name') : next.get('left.name')]: {
-                      equals: (!next.get('left').isBinaryExpression()) &&
-                        ['=', '=='].indexOf(next.get('operator')) >= 0 ?
-                        next.get('right') : null,
-                      notEquals: (!next.get('left').isBinaryExpression()) &&
-                        next.get('operator') === '!=' ?
-                        next.get('right') : null,
-                      moreThan: next.get('left').isBinaryExpression() &&
-                        (next.get('operator') === '<' || next.get('left.operator') === '>') ?
-                        (next.get('operator') === '<' ? next.get('right') : next.get('left.left')) :
-                        (next.get('operator') === '>' ? next.get('right') : null),
-                      lessThan: next.get('left').isBinaryExpression() &&
-                        (next.get('operator') === '>' || next.get('left.operator') === '<') ?
-                        (next.get('operator') === '>' ? next.get('right') : next.get('left.left')) :
-                        (next.get('operator') === '<' ? next.get('left') : null),
-                      moreThanOrEqual: next.get('left').isBinaryExpression() &&
-                        (next.get('operator') === '<=' || next.get('left.operator') === '>=') ?
-                        (next.get('operator') === '<=' ? next.get('right') : next.get('left.left')) :
-                        (next.get('operator') === '>=' ? next.get('right') : null),
-                      lessThanOrEqual: next.get('left').isBinaryExpression() &&
-                        (next.get('operator') === '>=' || next.get('left.operator') === '<=') ?
-                        (next.get('operator') === '>=' ? next.get('right') : next.get('left.left')) :
-                        (next.get('operator') === '<=' ? next.get('left') : null)
-                    }
-                  }), {});
-
-                  // Parse the parent node's type.
-                  if(argsNode.parent.isMemberExpression() && !argsNode.parent.computed) {
-                    // $.xx(xx)[xx]
-                    // Scoreboard variant visitor.
-                    argsNode.parent.replaceWith(
-                      t.callExpression(t.identifier('__score'),[
-                        t.callExpression(t.identifier(`__${currentlyType}`, [
-                          t.objectExpression(
-                            Object.keys(args).map(key => t.property(key, t.objectExpression(
-                              Object.keys(args[key]).map(type => t.property(type, args[key][type] || t.literal('null')))
-                            )))
-                          )
-                        ])), argsNode.parent.property
-                      ])
-                    );
-                  } else {
-                    // $.xx(xx).xx
-                    // NBT path visitor.
-                    argsNode.replaceWith(
-                      t.callExpression(t.identifier(`__${currentlyType}`), [
-                        t.objectExpression(
-                          Object.keys(args).map(key => t.property(key, t.objectExpression(
-                            Object.keys(args[key]).map(type => t.property(type, args[key][type] || t.literal('null')))
-                          )))
-                        )
-                      ])
-                    );
-                  }
-                  return;
-                } else {
-                  // $.xx
-                  // Just only a selector.
-                  typeNode.replaceWith(t.callExpression(
-                    t.identifier(`__${currentlyType}`),[
-                      t.objectExpression([])
-                    ]
-                  ));
-                  return;
-                }
-                
-              // Block selector
-              case 'from':
-                // $.from(xx, xx, xx).to(xx, xx, xx)
-                // Verify the schedule.
-                
-
-              case 'at':
-
-              // Unknown type handle
-              default:
-                throw typeNode.buildCodeFrameError('Unknown method!');
-            }
-          }
-        }
-      }
-    }
+const getTemplateInList = template => {
+  let ret = {};
+  const dfs = (obj, pathStr) => {
+    if (typeof obj !== 'object' || obj instanceof Tag) ret[pathStr] = obj;
+    else for (let i of Object.keys(obj)) dfs(obj[i], `${pathStr}.${i}`);
   }
+  for (let i of Object.keys(template)) dfs(template[i], i);
+  return { list: ret, type: template.type };
+};
+
+const getTemplateOutTree = (template, tags) => {
+  const dfs = path => {
+    if (typeof path !== 'object') return path;
+    else if (path instanceof Tag) return tags[path.key()];
+    else for (let i of Object.keys(path)) path[i] = dfs(path[i]);
+    return path;
+  }
+  return dfs(template);
+};
+
+const templateBuildOrder = {
+  ThisExpression: [],
+  ArrayExpression: ['elements'],
+  ObjectExpression: ['properties'],
+  Property: ['key', 'value', 'kind'],
+  FunctionExpression: [],
+  UnaryExpression: ['operator', 'prefix', 'argument'],
+  UpdateExpression: ['operator', 'argument', 'prefix'],
+  BinaryExpression: ['operator', 'left', 'right'],
+  AssignmentExpression: ['operator', 'left', 'right'],
+  LogicalExpression: ['operator', 'left', 'right'],
+  MemberExpression: ['object', 'property', 'computed'],
+  ConditionalExpression: ['test', 'alternate', 'consequent'],
+  CallExpression: ['callee', 'arguments'],
+  NewExpression: ['callee', 'arguments'],
+  SequenceExpression: ['expressions'],
+  ImportExpression: ['source'],
+  FunctionDeclaration: ['id'],
+  VariableDeclaration: ['declartions', 'kind'],
+  VariableDeclarator: ['id', 'init'],
+  // ... 控制语句部分尚未录入
+};
+
+const getTemplateOutBuilder = obj => t[obj.type.toLowerCase()].apply(
+  null,
+  templateBuildOrder[obj.type].map(key =>
+    Array.isArray(obj[key]) ?
+      obj[key].map(id => getTemplateOutBuilder(obj[key][id])) :
+      typeof obj[key] === 'object' ?
+        getTemplateOutBuilder(obj[key]) :
+        obj[key]
+  )
+);
+
+const templates // 从文件导入一个数组
+let visitor = {};
+
+for (let i of templates) {
+  if (!(i.in && i.out)) throw new Error('Unknown template! ' + i.toString());
+  i.in = getTemplateInList(i.in);
+  i.out = (path, tags) => path.replaceWith(getTemplateOutBuilder(getTemplateOutTree(i.out, tags)));
+
+  const func = path => {
+    let tags = {};
+    for(let n of Object.keys(i.in.list)) {
+      let t = path.get(n);
+      if(i.in.list[n] instanceof Tag) {
+        let val = i.in.list[n].value(t);
+        if(!val) return;
+        tags[i.in.list[n].key()] = val;
+      }
+      else if(i.in.list[n] !== t) return;
+      i.out(path, tags);
+    }
+  };
+
+  i.in = getTemplateInList(i.in);
+  i.out = (path, tags) => path.replaceWith(
+    getTemplateOutBuilder(getTemplateOutTree(i.out, tags))
+  );
+
+  visitor[i.in.type] = visitor[i.in.type] ? [func] : [...visitor[i.in.type], func];
+}
+
+for(let i of Object.keys(visitor)) {
+  // 合并各个函数
+  let list = visitor[i];
+  visitor[i] = path => list.forEach(f => f(path));
+}
+
+export default (babel) => ({
+  visitor
 })
