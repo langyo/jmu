@@ -8,7 +8,6 @@ The upgrade from JavaScript to MCFunction.
 
 - 从 V3 版本开始，JMU 以解析 AST 的形式转译指令，抛弃之前的模拟解析模式。
 - JMU 可接受文件夹层次类似于 Minecraft 函数包的 JavaScript 源代码项目，转译后写出的同样也是与所给函数包文件夹层次一致的行为包。
-- 凡是用于操作 Minecraft 的 JavaScript 语句，其均以开头为 $ 的全局变量提供。
 
 ## 二、基本语法
 
@@ -16,25 +15,25 @@ The upgrade from JavaScript to MCFunction.
 
 #### a. 方块
 
-- ```$.at(<x>, <y>, <z>)```
+- ```at(<x>, <y>, <z>)```
 
-- ```$.from(<x>, <y>, <z>).to(<x>, <y>, <z>)```
+- ```from(<x>, <y>, <z>).to(<x>, <y>, <z>)```
 
 #### b. 实体
 
-- ```$.s``` 或 ```$.self```
+- ```self``` 或 ```$s```
     指向执行者自身。
 
-- ```$.a``` 或 ```$.all```
+- ```all``` 或 ```$a```
     指向所有当前在线的玩家。
 
-- ```$.r``` 或 ```$.random```
+- ```random``` 或 ```$r```
     指向随机一个在线玩家。
 
-- ```$.p``` 或 ```$.nearest```
+- ```nearest``` 或 ```$n```
     指向距离执行者最近的一个玩家。
 
-- ```$.e``` 或 ```$.entity``` 或 ```$.entities```
+- ```entity``` 或 ```entities``` 或 ```$e```
     指向所有实体。一般情况下，你需要为这种选择器额外指定参数，以选择特定的实体。
 
 ### 2. 形容词
@@ -43,7 +42,7 @@ The upgrade from JavaScript to MCFunction.
 
 #### a.方位
 
-- ```dim = "overworld" | "dim-1" | "dim1"```
+- ```dim = "overworld" | "dim-1" | "dim1" | string```
 
 - ```x, y, z = <num>```
 
@@ -103,25 +102,25 @@ JavaScript 原生的逻辑二元运算符、```if```语句、```switch```语句�
 
 - ```<selector> // 存在则为真，不存在则为假```
 
-- ```$.at(<x>, <y>, <z>) ==|!= $at(<x>, <y>, <z>)|<blockName>```
+- ```at(<x>, <y>, <z>) ==|!= $at(<x>, <y>, <z>)|<blockName>```
 
-- ```$.from(<x>, <y>, <z>).to(<x>, <y>, <z>) ==|!= $at(<x>, <y>, <z>)```
+- ```from(<x>, <y>, <z>).to(<x>, <y>, <z>) ==|!= $at(<x>, <y>, <z>)```
 
 - ```<selector><path> // 存在则为真，不存在则为假```
 
-- ```$.at(<x>, <y>, <z>)<path> // 存在则为真，不存在则为假```
+- ```at(<x>, <y>, <z>)<path> // 存在则为真，不存在则为假```
 
 ```switch```语句仅可使用：
 
 - ```<expr>```
 
-- ```$.at(<x>, <y>, <z>)```
+- ```at(<x>, <y>, <z>)```
 
-- ```$.from(<x>, <y>, <z>).to(<x>, <y>, <z>)```
+- ```from(<x>, <y>, <z>).to(<x>, <y>, <z>)```
 
 - ```<selector><path>```
 
-- ```$.at(<x>, <y>, <z>)<path>```
+- ```at(<x>, <y>, <z>)<path>```
 
 #### b. 赋值与表达式
 
@@ -129,7 +128,7 @@ JavaScript 原生的算术运算符、赋值运算符均会自动转换为一系
 
 在赋值时，计分板变量还可限制值的类型与按所给常量放缩数值，以后缀点表达式控制。例如，下面的表达式使得原本的```self[var2]```先转换为 byte 类型再放大到其 2 倍后再存储：
 
-```$.self[var1] = $.self[var2].toByte.scale(2);```
+```self[var1] = self[var2].toByte.scale(2);```
 
 可用的后缀表达式有：
 
@@ -205,9 +204,9 @@ nbt.creeper({ NoAI: true })
 
 ### 6. 根指令
 
-- ```$.run(<command_path_string>)```
+- ```run(<command_path_string>)```
     执行一个已定义的函数
-- ```$.run(<command_list> | <single_command>)```
+- ```run(<command_list> | <single_command>)```
     临时定义一批指令并立即执行，相当于 lambda 函数或匿名函数
 - ```tell([who], <RAW_JSON>)```
     执行 tellraw，需要主语
@@ -224,7 +223,7 @@ nbt.creeper({ NoAI: true })
 - ```stopSound|stopsound()```
     执行 playsound/stopsound，其前可选择提供主语
     > source 为音源，grade 为音调，voice 和 minVoice 分别为默认音量和最小音量
-- ```$.time```
+- ```time```
     - ```.get()```          => time get
     - ```.set(<num>)```     => time set
         执行 time，不需要主语
@@ -240,16 +239,16 @@ nbt.creeper({ NoAI: true })
     执行 title，与 tellraw 类似
 - ```kill()```
     执行 kill；如果未指定目标，则直接作用于主语所选对象
-- ```$.objective(<objective>)```
+- ```objective(<objective>)```
     - ```.setDisplay(<type>)```
     - ```.setName(<name>)```
         执行 scoreboard objectives
         > 值得一提，JMU 会自动创建所有的编写者用过的计分板变量名，并加前缀以保证区分与其它包的变量（可通过在变量名开头加 # 阻止此行为）
-- ```$.datapack```
+- ```datapack```
     - ```enable(<name>)```
     - ```disable(<name>)```
         执行 datapack，无需主语
-- ```$.bossbar(<id>)```
+- ```bossbar(<id>)```
     - ```currentValue|value(<name>) | maxValue(<num>)```
     - ```setDisplay(<'notched_6' | 'notched_10' | 'notched_12' | 'notched_20' | 'progress'>)```
     - ```visible(<true | false>)```
@@ -272,11 +271,11 @@ nbt.creeper({ NoAI: true })
 - ```replace(<item_pos>)[.as(<item>, [nbt])]```
     执行 replaceitem 需要主语
     > 如果不提供 as 子句，默认为 air 空气
-- ```$.seed()```
+- ```seed()```
     执行 seed
-- ```$.schedule(<time>).run(<...>)```
-- ```$.scheduleSeconds(<time>).run(<...>)```
-- ```$.scheduleDays(<time>.run(<...>))```
+- ```schedule(<time>).run(<...>)```
+- ```scheduleSeconds(<time>).run(<...>)```
+- ```scheduleDays(<time>.run(<...>))```
     执行 schedule 命令；必须带 run 子句
 - ```tag(<id>)```
     - ```.give|add()```
@@ -293,7 +292,7 @@ nbt.creeper({ NoAI: true })
 - ```$spread(<x>, <z>).range(<num>).spacing(<num>)[.teamMeet()]```
     执行 spreadplayers 命令，无需主语
     > range 表示分散最大范围，spacing 为最小间距，teamMeet 为是否同队实体传送在一起
-- ```$.loadChunk|forceLoad|forceload(<x>, <z>)```
+- ```loadChunk|forceLoad|forceload(<x>, <z>)```
     - ```.load()```
     - ```.remove()```
     - ```.removeAll()```
@@ -317,7 +316,7 @@ nbt.creeper({ NoAI: true })
 
 对于第二个例子，如果传入的其中任意一个参数相当于常量，那么函数执行时也会视此参数为常量。这种特性适用于制作用于生成模板指令的工厂函数，进而供人作为库调用。
 
-对于第三个例子，```round```、```filter```和```map```时 JMU 中仅有的用于批量生成常量的安徽念书，它们会被作为 JavaScript 语句运行，而不会转换为指令序列。
+对于第三个例子，```round```、```filter```和```map```时 JMU 中仅有的用于批量生成常量的函数，它们会被作为 JavaScript 语句运行，而不会转换为指令序列。
 
 #### 2. 无引用、全部传参与建立新变量均使用值传递的警告
 
